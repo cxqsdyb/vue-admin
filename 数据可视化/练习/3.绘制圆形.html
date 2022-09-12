@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    canvas {
+      border: 1px black solid;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas width="600px" height="600px"></canvas>
+</body>
+<script>
+  // 获取DOM
+  let canvas = document.querySelector('canvas');
+  // 获取上下文
+  let ctx = canvas.getContext('2d');
+  // 开始绘制圆形
+  ctx.beginPath();
+  // 绘制圆形的方法
+  // 参数：x,y,半径，起始弧度，结束弧度(弧度：360°=2*pi),是否逆(true)/顺时针
+  ctx.arc(300, 300, 200, 0, 2 * Math.PI, false);
+  // 设置填充
+  ctx.fillStyle = 'skyblue';
+  ctx.fill();
+  // 绘制圆形
+  ctx.stroke();
+</script>
+
+</html>

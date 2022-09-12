@@ -1,0 +1,426 @@
+后台管理系统
+    下载模板中文件夹功能
+        build:webpack配置文件
+        mock:模拟后台数据
+        node_modules：项目依赖的模块
+        public：ico图标、静态页面，打包时不会编译，会打包到dist文件夹
+        src：程序员源码
+            api：axios请求
+            assets：静态资源，打包时会进行编译
+            components：非路由组件和全局组件
+            icons：放svg矢量图
+            layout：组件与混入
+            router：路由相关
+            store：vuex
+            style：样式相关
+            utils：其中request.js为axios的二次封装
+            views：路由组件
+        app.vue 根组件
+        permission.js 路由守卫相关
+        setting：页面设置项相关
+        .env.development(开发环境)
+        .env.producation(生产环境)
+    缺少node_modules文件夹
+    npm install 把需要的包都下载下来
+
+登录功能
+    静态组件
+    手写api
+    axios的二次封装（请求拦截器。。。）
+    解决跨域（代理服务器）
+    this.$store.dispatch('user/login', this.loginForm)
+     // user/login的意思是user仓库下actions中的login函数
+     原本为mock，换成真实接口后要解决跨域问题
+     解决：vue.config.js
+
+     axios请求中的params参数和data参数
+        params参数是放在url上的
+        data参数是放在请求体里的
+
+    vue.config.js中：
+    如果是mock数据：before: require('./mock/mock-server.js')
+    如果使用真实数据，需要解决跨域：
+        proxy: {
+            "/dev-api": {
+                target: "http://localhost:3000",
+                pathRewrite: {"^/dev-api" : ""}
+            }
+            }
+        注意，本次项目的开发环境下请求url的头部为dev-api
+
+退出登录
+
+路由的搭建
+    使用了二级路由的懒加载
+    children:[{
+      path: 'tradeMark',
+      name: 'TradeMark',
+      component:()=>import('@/views/products/tradeMark')
+    }]
+    粗心问题：路由中的meta写成了mata，导致无法显示分级路由
+
+商品管理
+    margin是从上开始，顺时针
+
+    element-ui表格
+        border	是否带有纵向边框
+        stripe	是否为斑马纹 table
+     el-table-column
+         label：对应列的标题
+         width：对应列的宽度
+         align：标题的对齐放松
+         prop：对应列得字段名，即v-for item in xxx {{item.???}} 中的???      
+    el-pagination是element-ui的分页器
+    style="text-align: center" 使分页器水平居中
+    ->表示让分页器的一部分放到最右边
+    pager-count 页码按钮数量：连续页码数+2(>=5的奇数)
+
+api配置
+    为商品管理下的四个二级分类分别配置api
+    新建product文件夹，在里面分别配置！
+    在index.js统一对外默认暴露
+    再挂载在vue原型上：$API
+
+品牌列表实现
+     const {page,limit} = this;//解构
+     组件内async await接收数据
+    elementUI中的table组件是按列展示数据的
+    table中不会直接显示图片，而是显示图片的链接地址
+    解决：作用域插槽（必须是row！）
+         <template slot-scope="{ row }">
+         <img :src="row.logoUrl" />
+    分页器页码改变和单页显示数量改变
+     @size-change @current-change
+     将@current-change改变当前页的功能合并到getPageList中！
+
+修改和添加品牌
+    写api（注意别漏了return！！！！）
+    收集表单数据
+        为外层表单el-form绑定数据,表单内部修改数据
+        对于本项目而言，myForm为一个对象，里面包含两个属性：名称和logo
+        这两个属性的名字不能随便写，需要和接口文档的要求一致
+
+    <el-form ref="form" :model="myForm">
+    <el-form-item prop="tmName">
+     <el-input v-model="form.name"></el-input>
+     :model="form"	绑定表单数据对象到对象myForm
+     prop="tmName"  绑定表单中的该元素到对象myForm的tmName属性
+    注意:prop的值不能乱写!必须对应model绑定数据对象的key值!
+
+     注意：在el-upload组件中无法使用v-model！因为v-model只能在表单元素中使用！！！
+     解决：el-upload中有一个属性action，设置图片上传地址
+     注意，action里的地址需要加上项目对应的前缀！这里加/dev-api
+     on-success在上传成功后执行 形参有两个值res和file
+     before-upload在上传成功前执行
+
+     还要别的问题：点击添加后点取消，下次点击添加时，上次的图片还在
+     解决：每次点击添加时，清空表单
+
+     修改品牌，需要获取当前品牌的信息，传参：slot-scope="{ row }"中的row
+     
+     问题：this.myForm = row;
+        修改时，页码中绑定的row和this.myForm实现了浅拷贝
+        即使没有点击确认修改，页面还是会变化！
+        解决：深拷贝！
+        
+    修改和添加品牌时的表单验证
+        Form 组件提供了表单验证的功能，只需要通过 rules 属性传入约定的验证规则，
+        并将 Form-Item 的 prop 属性设置为需校验的字段名即可。
+        注意:prop='xxx'中的xxx不能乱写,xxx就是绑定的想要验证的数据
+        在点击确定时,进行全部表单的验证
+        给需要验证的表单绑ref
+         this.$refs[formName].validate((valid)=>{})
+         valid 为 true/false
+
+         此外,也可以用element-ui的自定义校验规则(重点)
+
+删除商品功能
+    api配置
+    用到了elementUI中的弹框，包含确定和取消按钮
+    对应返回成功/失败的promise
+    注意：删除元素后停留的页码需要判断！
+        如果当前页只有一个元素，删除后应该跳转前一页！
+        否则停留在当前页
+
+平台属性管理 Attr组件
+    运用elementUI的card组件和行内表单组件
+    三级联动组件封装为全局组件！在components文件夹新建！
+        并在main.js中全局注册！
+        Vue.component(xxx.name, xxx)
+        使用elementUI的行内表单
+        一级分类选择了，才可以选择二级分类，否则没有数据
+    三级联动组件
+        配置api
+            获取一级
+            一级参数，获取二级
+            二级参数，获取三级
+        收集一级分类选择的id
+            表单外层绑定一个数据对象:model="xxx"，
+            表单内修改的数据都是对象xxx的的属性
+        外层 el-select 获取的数据是内部 el-option 中value的值！
+            一级分类绑定@change事件，就可以在获取一级id后请求二级分类！
+        注意：当一级分类选择变化后，之前选择的二级分类和三级分类需要清空！
+        即在改变一级分类时，清空二级分类和三级分类的列表和id(光清空列表不行！还要清id！)
+
+    三商品管理组件和级联动组件之间是父子组件关系
+        绑定自定义事件！，子组件中传给父组件一二三级的id！
+    功能：所有三级分类都选择好，向服务器发请求，修改返回数据！
+    实现：每修改一次分类，告知父组件(id,level)，父组件判断三个id都有了，就向服务器请求！
+    注意：不能只在第三级选完后再向父组件告知！
+        因为一旦修改了三级分类中的任意一个，就不能修改数据！
+        需要三个都选完才能修改！
+        此外，父组件收到一级id后，需要清空二级和三级id！ 
+                    收到二级id后，需要清空三级id！ 
+    
+    完成下部分商品属性管理组件
+        el-table、作用域插槽、el-tag（不同属性值，标签形式！）
+        有3id才能使用添加按钮，否则处于禁用状态
+        点击添加/修改按钮时，表格不显示，而是显示修改/添加属性的表单！
+
+    添加属性功能
+        完成静态页面、配置API
+        完成收集数据功能
+            注意：不要再vue的data中使用this！
+                因为data传回的是一个对象，是无序的，可能会出现undefined的情况
+                例：data(){
+                    return{
+                        x:'abc',
+                        y:this.x//不能这么写！！！！
+                    }
+                    }
+            使用作用域插槽收集表单数据
+            起始状态无数据，点击添加按钮后添加！
+        功能：只有属性名写好后，才可以点击添加属性值按钮！
+        问题：输入新的属性值后点击取消，再点击添加新的属性值后，上一次的数据还在
+            即：数据回显问题
+        解决：每次点击按钮时，清空数据！
+            此外，点击添加属性按钮时，收集3Id,因为服务器需要！
+
+    修改属性值功能
+        将选中属性的信息传给修改/添加属性值的表单
+        实现：作用域插槽
+        将row中的2数据赋值到表单中！深拷贝！
+        为什么使用深拷贝？
+            原因：对象中有数组！
+        可以使用lodash中的cloneDeep！
+        import cloneDeep from 'lodash/cloneDeep'
+        注意：修改属性值需要携带attrid！因为是在已有属性的前提下添加属性值
+            如果是添加就是undefined，如果是修改就与修改前的属性id一致
+
+    添加属性值的其他设置
+        功能：默认为查看模式(<span>)，点击后变成修改模式(<input>)
+        实现：v-show @blur 失去焦点或敲回车时，由修改模式变为查看模式   
+                @keyup.native.enter @click只能用于原生dom，故需要加.native!
+        注意：无法只用设置flag的方法控制多个属性值的模式切换
+        实现：为每一个属性值绑定flag！
+
+        问题：新增的属性值不能为空！且不能与之前的属性值重复！
+        实现：String.trim=='' 判断字符串去除前后空格后是否为空
+                Array.some 遍历所有元素，只要有一个满足就返回true，否则返回false
+                由此判断是否重复！
+
+    修改属性的其他设置
+        问题：修改属性对应的属性值上没有flag，无法实现修改/查看模式的切换！
+        解决：为每一个属性值添加flag
+            要用$set添加！将flag变为响应式的！
+            this.$set(obj, key, value)
+            key是字符串！
+
+    属性值进入编辑模式后自动获取焦点
+        实现：:ref='$index'
+        问题：绑定ref后无法自动获取焦点
+            点击span时，页面的input的DOM还没加载好（重绘重排需要时间！）
+        解决：$nextTick
+    点击添加属性值时自动聚焦！
+
+    点击删除按钮弹出通知框
+        实现：ElementUI Popconfirm 气泡确认框
+        绑定事件 confirm  cancel（不是必须绑）  
+        （老版本需要加on！onConfirm）
+    
+    在修改属性值页面点击保存按钮，提交服务器
+        问题：1、多次点击添加属性值按钮会添加多条空的属性值，需要去掉!
+            2、发给服务器需要去掉flag
+        实现：Array.filter  delete obj.xxx 删除属性
+
+    在修改属性值时，下拉框是禁用状态
+    实现：父子组件通信：props
+    如果属性值列表为空，则保存按钮不可用！
+
+SPU和SKU的关系：
+    SPU是类，SKU是类的实例
+
+SPU模块完成
+    共三种功能页面切换：
+        1.显示SPU列表
+        2.添加/删除SPU
+        3.添加sku
+    1.静态页面
+        创意：加loading
+    2.API
+        这里的get请求中需要params参数，直接写在axios请求中
+            params: {category3Id} 写成对象形式！！！！ 
+    3.完成动态页面
+        将（按钮：elbutton+移入汽包提示：a标签）封装为全局组件
+            实现：$attrs(收集父传子的属性props)
+                $listeners获取父组件传给子组件的自定义事件
+                注册全局组件
+    4.实现三个功能页面切换
+        通过数字控制
+        其他两个页面切换作为子组件来写，不然都写在一起太过复杂！
+        然后在其父组件中引入+注册（components属性里注册！别忘了！）
+
+        SPU修改/添加
+            1.API：
+                获取所有品牌
+                获取销售属性（共三个：颜色、版本、尺码）
+                获取某一个SPU的信息
+                获取SPU图片
+            2.自定义事件，子给父传数据
+            3.发请求位置
+                不能写在子组件的mounted中，会出错！（只在挂载完时执行一次，v-show只是隐藏，但是已经挂载了）
+                可以在父组件中，点击按钮就发送请求
+                但是子组件中重新选择后也要发送请求！
+
+                解决：子组件中写请求，在父组件点击按钮时调用
+                    即：父组件调用子组件的方法！
+            
+            难点：
+                面包屑功能：
+                    可以叉掉，后面也有添加按钮和输入框的切换（v-if，v-else）
+                    实现：为每个面包屑绑定flag控制显示按钮/输入框
+                销售属性共有三个，但是选择的商品不一定有这三个
+                    下拉菜单需要显示没有的销售属性
+                    实现：计算属性+Array.filter+Array.filter
+                    (难点！unSelectSaleAttr的得到！)
+
+            照片墙的数据收集
+                照片墙展示数据时需要每个图片都带有name、url这两个属性
+                但是提交服务器时需要去除这两个属性
+                收集上传图片成功事件on-success绑定函数的第三个参数：fileList
+            
+            销售属性添加/删除
+                在下拉框收集新增销售属性的id和name
+                收集到spuInput.spuSaleAttrList中
+            
+            销售属性值的添加和删除
+                在点击添加按钮时为每一个属性值绑定一个flag($set)，用来控制是否显示输入框
+                在spuInput中收集！
+                判断：不为空(string.trim())，不重复(array.some()!!!!!)
+                问题：敲回车时，会同时触发失去焦点事件和回车事件！
+                    会错误提示输入不能为空！
+                解决：使敲回车的事件响应指向失去焦点事件！
+                        @keyup.native.enter="$event.target.blur"
+
+            注意：array.some() 有一个为true就返回true
+                array.every() 全为true，才返回true
+                
+            点击保存按钮【
+                图片列表的数据需要进行处理
+                    从SpuImageList转移到spuInput中
+                    需要将图片的本地地址改为上传后服务器返回的地址
+                    去掉name和url属性
+                    使用array.map()方法遍历，返回新数组
+                        
+                销售属性值的数据也要处理
+
+        SPU的添加
+            需要发送两个请求：品牌列表、所有销售属性
+            注意：需要获取3id！
+            修改spu时，3id是通过服务器返回数据获得的
+            添加spu时，3id通过父组件传给子组件！
+        
+        清空数据的方法！！！！！！！！
+            一个一个把data中的数据清空很麻烦！
+            解决：
+            Object.assign() ES6的方法，可以合并对象
+            Object.assign(this._data, this.$options.data());
+            其中，this._data为data中的响应式数据
+                this.$options为当前配置对象，其中data函数的返回值为data中的数据（初始数据，可以用于清除数据）
+
+        SPU的删除
+            弹出气泡确认框
+                别忘了给按钮加slot="reference"
+
+        SKU的添加
+            一行内多个下拉菜单，还有label，故el-form-item里嵌套el-form，并设置为行内！
+            点击添加SKU按钮时，父组件通知子组件发送三个请求
+                图片列表、销售属性、平台属性
+                收集平台属性下拉的选择数据到attrInfoList中，原因是其大小与需要收集数据的大小一致
+                同理销售属性的收集
+
+                图片区域操作栏设置默认图片
+                两种按钮，根据是否是默认图片显示其中之一
+                    在收集数据时为每个图片的数据加上属性:isDefault
+                    直接赋值给图片列表,故不需要$set来设置响应式
+                前面的勾选框触发事件：@selection-change
+
+                点击保存按钮,收集并将数据发给服务器
+                    Array.reduce((prev,item)=>{......;return prev},初始值)方法收集数据
+                        遍历每个元素并执行回调,返回一个结果
+                    Array.map()
+                        遍历每个元素并执行回调,返回新数组
+SKU模块
+    操作中点击详情按钮，会出现右边栏（elementui中的抽屉组件）
+        使用el-drawer实现抽屉
+        使用el-row（一行，共24块）、el-col（块）实现布局
+        使用el-carousel实现图片轮播功能
+    
+    深度选择器
+        style标签中的scoped属性作用：
+            为当前子组件的结构中添加data-v-xxx(xxx为哈希值)的自定义属性
+            如果父组件和子组件样式都加上scoped，而且父组件的样式需要影响子组件的样式
+            那就使用深度选择器！
+
+            深度选择器：实现样式穿透
+            >>> .xxx{}
+
+作用域插槽
+    默认插槽：子组件（<child>）z中写<slot></slot>
+            父组件中在<child>xxx</child>中的xxx中写的内容会展示在子组件<slot>指定的位置！
+    具名插槽：子组件（<child>）中有多个插槽！
+        子组件：<slot name='footer'></slot>
+        父组件：<template><a slot="footer"></a></template>
+    作用域插槽：懂得都懂
+
+数据可视化(主页)
+    上面四个卡片
+        头部：网格布局实现自适应
+            el-row el-col（24块）
+            栅格间隔：gutter设置卡片间隔
+        内容区
+        图表区：由父组件传结构！（不再是传参数！）
+            实现：具名插槽(专门用于传结构！)
+            传折线图：新定义组件lineChart
+                在mounted中获取dom，用echarts完成画图！
+            实现柔和的曲线：拐点设置为透明、渐变色、平滑曲线
+            实现进度条：y轴设置type: 'category',使柱状图在y轴上
+    
+    中部大图+排行榜
+        使用时间选择器，设置双向绑定数据样式
+        用dayjs插件获取当前时间
+        根据tab选择的不同（销售/访问）切换图表
+            实现：、将图表实例放在data中、watch中进行重新配置
+            如果修改echarts中的配置，只需用setOption配置需要修改的项即可！
+                不修改的项无需再配置一遍！
+
+    使用mock模拟数据
+        修改mock-server中的api
+        配置请求路径、返回数据
+        新建axios(发给mock)
+        vue.config.js配置mock
+    
+    需要监听数据，一旦有数据，立刻显示！
+    监听tab变化，一旦切换，立即切换图表！
+
+ 用户权限管理
+     el-tree 组件实现用户权限管理
+    问题：如何实现不同权限等级的用户登陆时看到不同的左侧菜单
+    解决：用户登陆时返回结果中包含属性：routes，为当前用户可以展示哪些菜单
+        还有其他信息，为用户的权限信息
+    问题：如何根据接收到的权限信息来显示不同的左侧工具？
+    解决：拆分路由：常量路由（所有人可见，例如：登录，首页）    
+                   异步路由（权限） 筛选出可以跳转的路由
+                   任意路由：路径出错，重定向
+    注意：使用递归将各个子路（二级、三级。。。）由过滤出来！！！               
+        并在仓库中引入路由组件，进行添加

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.3.2/echarts.js"></script>
+  <style>
+    div {
+      width: 800px;
+      height: 400px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="box1"></div>
+  <div id="box2"></div>
+  <script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('box1'));
+    var myChart2 = echarts.init(document.getElementById('box2'));
+    // 绘制图表
+    myChart1.setOption({
+      // 图表标题
+      title: {
+        // 主标题
+        text: '数据可视化',
+        textStyle: { color: 'pink' },//主标题样式
+        // 子标题
+        subtext: 'echarts的基本使用',
+        // 标题设置居中
+        left: 'center'
+      },
+      // 
+      // tooltip: {},
+      // X轴的配置项
+      xAxis: {
+        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+      },
+      // Y轴的配置项
+      yAxis: {
+        // y轴线的设置
+        axisLine: {
+          show: true,//显示y轴
+        },
+        // y轴刻度设置
+        axisTick: {
+          show: true,//显示刻度
+        }
+      },
+      // 系列的设置：图表类型、数据
+      series: [
+        {
+          name: '销量',
+          type: 'bar',//图表类型：柱状图
+          data: [5, 20, 36, 10, 10, 20],
+          color: 'red'
+        }
+      ]
+    });
+    myChart2.setOption({
+      title: {
+        text: '折线图',
+        left: 'center',
+        textStyle: {
+          color: 'red'
+        },
+        subtext: 'echarts的使用',
+        subtextStyle: {
+          color: 'pink'
+        }
+      },
+      xAxis: {
+        data: ['星期一', '星期二', '星期三', '星期四', '星期五']
+      },
+      yAxis: {},
+      series: [
+        {
+          type: 'line',
+          data: [10, 20, 30, 15, 50],
+          color:'cyan'
+        }
+      ]
+    })
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.3.2/echarts.js"></script>
+  <style>
+    div {
+      width: 800px;
+      height: 400px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+
+  </div>
+  <script>
+    var myChart = echarts.init(document.querySelector('div'));
+    myChart.setOption({
+      dataset: {
+        source: [
+          ['衬衫', 10, 20, '男'],
+          ['羊毛衫', 20, 70, '女'],
+          ['雪纺衫', 5, 10, '其他'],
+          ['皮鞋', 30]
+        ]
+      },
+      title: {
+        text: '数据可视化',
+        textStyle: { color: 'pink' },
+        subtext: 'echarts的基本使用',
+        left: 'center'
+      },
+      xAxis: { type: 'category' },
+
+      yAxis: {
+        axisLine: {
+          show: true,
+        },
+        axisTick: {
+          show: true,
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          color: 'red',
+          // 柱状图数据
+          encode: {
+            y: 1
+          }
+        },
+        {
+          type: 'pie',
+          encode: {
+            // 饼图数据
+            value: 2,
+            // 饼图的文字
+            itemName: 3,
+          },
+          width: 200,//饼图的宽高
+          height: 200,
+          left: 100,//饼图的位置
+          top: 20,
+          radius: 50,//为了避免显示不全，设置饼图的半径
+        }
+      ]
+    });
+  </script>
+</body>
+
+</html>

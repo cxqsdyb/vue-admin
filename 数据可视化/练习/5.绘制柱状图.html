@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    canvas {
+      border: 1px black solid;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas width="900px" height="800px"></canvas>
+</body>
+<script>
+  // 获取DOM
+  let canvas = document.querySelector('canvas');
+  // 获取上下文
+  let ctx = canvas.getContext('2d');
+  // 绘制表名
+  ctx.font = '16px 微软雅黑';
+  ctx.fillText('数据可视化-柱状图', 50, 50);
+  // 绘制线段：X,Y轴
+  ctx.moveTo(100, 100);//起点
+  ctx.lineTo(100, 400);//其他点
+  ctx.lineTo(700, 400);//其他点
+  ctx.stroke();
+  // 绘制坐标平行线
+  {
+    ctx.moveTo(100, 100);//起点
+    ctx.lineTo(700, 100);//其他点
+    ctx.moveTo(100, 150);//起点
+    ctx.lineTo(700, 150);//其他点
+    ctx.moveTo(100, 200);//起点
+    ctx.lineTo(700, 200);//其他点
+    ctx.moveTo(100, 250);//起点
+    ctx.lineTo(700, 250);//其他点
+    ctx.moveTo(100, 300);//起点
+    ctx.lineTo(700, 300);//其他点
+    ctx.moveTo(100, 350);//起点
+    ctx.lineTo(700, 350);//其他点
+    ctx.stroke();
+  }
+  // 绘制坐标轴
+  {
+    ctx.moveTo(250, 400);
+    ctx.lineTo(250, 390);
+    ctx.moveTo(400, 400);
+    ctx.lineTo(400, 390);//其他点
+    ctx.moveTo(550, 400);
+    ctx.lineTo(550, 390);//其他点
+    ctx.moveTo(700, 400);
+    ctx.lineTo(700, 390);//其他点
+    ctx.stroke();
+  }
+  // 坐标轴文字
+  {
+    // X轴
+    ctx.fillText('食品', 165, 430);
+    ctx.fillText('服饰', 315, 430);
+    ctx.fillText('出行', 465, 430);
+    ctx.fillText('数码', 615, 430);
+    // Y轴
+    ctx.fillText('300', 70, 110)
+    ctx.fillText('250', 70, 160)
+    ctx.fillText('200', 70, 210)
+    ctx.fillText('150', 70, 260)
+    ctx.fillText('100', 70, 310)
+    ctx.fillText('  50', 70, 360)
+    ctx.fillText('   0', 70, 410)
+  }
+  // 绘制矩形
+  {
+    // 绘制矩形的第二种方法（有填充颜色）
+    ctx.fillStyle = 'red';
+    ctx.fillRect(125,200,100,200);
+  }
+</script>
+
+</html>

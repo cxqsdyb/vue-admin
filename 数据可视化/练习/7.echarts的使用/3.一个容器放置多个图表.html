@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一个容器放置多个图表</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.3.2/echarts.js"></script>
+  <style>
+    div {
+      width: 800px;
+      height: 400px;
+    }
+  </style>
+</head>
+
+<body>
+  <div></div>
+  <script>
+    const dom = document.querySelector('div');
+    const myChart = echarts.init(dom);
+    myChart.setOption({
+      title: {
+        text: '数据可视化',
+        textStyle: { color: 'pink' },
+        subtext: 'echarts的基本使用',
+        left: 'center'
+      },
+      xAxis: {
+        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+      },
+      yAxis: {
+        axisLine: {
+          show: true,
+        },
+        axisTick: {
+          show: true,
+        }
+      },
+      // 在series里实现多个图表
+      series: [
+        // 柱状图
+        {
+          type: 'bar',
+          data: [5, 20, 36, 10, 50, 40],
+          color: 'red'
+        },
+        // 折线图
+        {
+          type: 'line',
+          data: [5, 20, 36, 10, 50, 40],
+          color: 'cyan'
+        },
+        // 饼图
+        {
+          type: 'pie',
+          data: [{name:'男',value:0.2},{name:'女',value:0.7},{name:'未知',value:0.1}],
+          width:200,//饼图的宽高
+          height:200,
+          left:100,//饼图的位置
+          top:20,
+          radius:50,//为了避免显示不全，设置饼图的半径
+        },
+      ]
+    });
+  </script>
+</body>
+
+</html>

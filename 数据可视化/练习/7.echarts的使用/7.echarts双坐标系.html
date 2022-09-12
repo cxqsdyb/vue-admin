@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.3.2/echarts.js"></script>
+  <style>
+    #main {
+      width: 100%;
+      height: 400px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="main"></div>
+  <script>
+    let dom = document.getElementById('main');
+    let myChart = echarts.init(dom);
+    // 一个坐标系
+    myChart.setOption({
+      title: {
+        text: '双坐标系',
+        subtext: '折线图+柱状图'
+      },
+      xAxis: {
+        data: ['游戏', '音乐', '视频', '阅读']
+      },
+      yAxis: [
+        {
+          axisLine: {
+            show: true
+          },
+          axisTick: {
+            show: true
+          }
+        },
+        {
+          axisLine: {
+            show: true
+          },
+          axisTick: {
+            show: true
+          }
+        }],
+      series: [
+        {
+          type: 'bar',
+          data: [10, 20, 30, 15],
+          yAxisIndex: 0,//使用坐标的坐标轴
+        },
+        {
+          type: 'line',
+          data: [6, 20, 90, 100],
+          yAxisIndex: 1
+        }
+      ]
+    })
+  </script>
+</body>
+
+</html>
